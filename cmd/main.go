@@ -88,7 +88,7 @@ func main() {
 		if err != nil {
 			fmt.Print(err.Error())
 		}
-		config, err := LoadConfig("conf/conf.yaml")
+		config, err := LoadConfig("conf.yaml")
 		if err != nil {
 			fmt.Print(err.Error())
 		}
