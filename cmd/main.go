@@ -1,7 +1,6 @@
 package main
 
 import (
-	"ali-ddns/model"
 	"fmt"
 	"github.com/aliyun/alibaba-cloud-sdk-go/services/alidns"
 	"gopkg.in/yaml.v3"
@@ -9,6 +8,14 @@ import (
 	"net/http"
 	"time"
 )
+type Config struct {
+	AccessKey string `yaml:"access_key"`
+	SecretKey string `yaml:"secret_key"`
+	Domain    string `yaml:"domain"`
+	Record    string `yaml:"record"`
+	RegionID  string `yaml:"region_id"`
+}
+
 
 func GetIP() (string, error) {
 	responseClient, errClient := http.Get("https://ipw.cn/api/ip/myip") // 获取外网 IP
@@ -22,8 +29,8 @@ func GetIP() (string, error) {
 	clientIP := fmt.Sprintf("%s", string(body))
 	return clientIP, nil
 }
-func LoadConfig(filename string) (*model.Config, error) {
-	c := new(model.Config)
+func LoadConfig(filename string) (*Config, error) {
+	c := new(Config)
 	b, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -37,7 +44,7 @@ func LoadConfig(filename string) (*model.Config, error) {
 	return c, nil
 }
 
-func GetRecord(client *alidns.Client, conf *model.Config) (*alidns.Record, string) {
+func GetRecord(client *alidns.Client, conf *Config) (*alidns.Record, string) {
 	res := new(alidns.Record)
 	request := alidns.CreateDescribeDomainRecordsRequest()
 	request.Scheme = "https"
@@ -57,7 +64,7 @@ func GetRecord(client *alidns.Client, conf *model.Config) (*alidns.Record, strin
 	}
 	return res, ""
 }
-func UpdateRecord(client *alidns.Client, conf *model.Config, record *alidns.Record, ip string) string {
+func UpdateRecord(client *alidns.Client, conf *Config, record *alidns.Record, ip string) string {
 	if record.Value==ip {
 		return fmt.Sprintf("ip(%s) need't update.",record.Value)
 	}else {
