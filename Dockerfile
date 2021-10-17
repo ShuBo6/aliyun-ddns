@@ -13,7 +13,7 @@ RUN export http_proxy=http://192.168.2.4:7890 \
 
 # Copy the go source
 COPY cmd/ cmd/
-
+COPY conf/ conf/
 # Build
 RUN go build -o ali-ddns cmd/main.go
 
@@ -21,6 +21,7 @@ RUN go build -o ali-ddns cmd/main.go
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
 FROM ubuntu
 WORKDIR /
+COPY --from=builder /workspace/conf/ .
 COPY --from=builder /workspace/ali-ddns .
 
-ENTRYPOINT ["/ali-ddns"]
+ENTRYPOINT ["./entrypoint.sh"]
